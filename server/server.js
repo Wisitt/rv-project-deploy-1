@@ -79,7 +79,7 @@ const options = {
     },
     servers: [
       {
-        url: process.env.API_HOST || "http://localhost:5000/",
+        url:"http://184.73.20.9:5000/"  || "http://localhost:5000/",
       },
     ],
   },
