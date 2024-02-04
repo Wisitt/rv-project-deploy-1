@@ -5,6 +5,9 @@ const client = require("./configs/database.js");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const multer = require("multer");
+const serveStatic = require("serve-static"); 
+const path = require("path");
+
 
 const port = process.env.PORT || 5000;
 
@@ -20,13 +23,8 @@ const storage = multer.diskStorage({
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.get("*", serveStatic({ root: "../client/dist/index.html" }));
-app.get(
-  "*",
-  serveStatic({
-    path: "../client/dist/index.html",
-  })
-);
+// Serve static files from the "client/dist" directory
+app.use(serveStatic(path.join(__dirname, "../client/dist")));
 
 // test route
 app.get("/", (req, res) => {

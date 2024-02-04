@@ -1,3 +1,4 @@
+import imgLogo from "../../img/rmutp-logo.png"
 import React, { useState, useEffect  } from "react";
 import "./Login.scss";
 import axios from "axios";
@@ -149,7 +150,7 @@ const Login: React.FC = () => {
     {!loading &&  (
       <div className="login-form">
       <div className="login-logo text-center text-3xl font-semibold mb-6 text-gray-800 text-white">
-        <img src="../../../dist/assets/img/rmutp-logo.png" alt="" />
+        <img src={imgLogo} alt="" />
           <h1>
           Room Reservation System at RMUTP
           </h1>
