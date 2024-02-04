@@ -79,7 +79,7 @@ const options = {
     },
     servers: [
       {
-        url:"http://3.84.85.89:5000/"  || "http://localhost:5000/",
+        url:"http://54.196.42.228:5000/"  || "http://localhost:5000/",
       },
     ],
   },
