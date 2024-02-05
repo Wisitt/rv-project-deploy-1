@@ -37,7 +37,8 @@ type ApiResponse = {
 };
 
 const Room: React.FC = () => {
-  // const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
+  const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
+
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [reportDetail, setReportDetail] = useState<string>("");
   const [reservationReason, setReservationReason] = useState<string>("");
@@ -82,13 +83,26 @@ const Room: React.FC = () => {
   });
   const [availableRoomTypes, setAvailableRoomTypes] = useState<string[]>([]);
   const [roomnumber, setRoomnumber] = useState<{ room_id: string; room_number: string }[]>([]);
+
   useEffect(() => {
-    fetchRoomNumber();
-}, []);
-  const fetchRoomNumber = async () => {
-    const response = await axiosInstance.get("/admin/room/getroomnumber");
-    setRoomnumber(response.data);
-}
+    const fetchRoomNumber = async () => {
+      if (selectedFloor) {
+        try {
+          const response = await axiosInstance.get(`/admin/room/getroomnumber/${selectedFloor}`);
+          setRoomnumber(response.data);
+        } catch (error) {
+          console.error("Error fetching room numbers:", error);
+        }
+      }
+    };
+
+    if (selectedFloor) {
+      fetchRoomNumber();
+    }
+  }, [selectedFloor]);
+
+  
+  
   const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
   
@@ -298,11 +312,7 @@ const Room: React.FC = () => {
               <FormLabel>ชั้น</FormLabel>
               <SelectStyle
                 placeholder="เลือกชั้น"
-                onChange={(_, value) =>
-                  handleInputChange({
-                    target: { name: "room_level", value },
-                  } as React.ChangeEvent<HTMLInputElement>)
-                }
+                onChange={(_, value) => setSelectedFloor(value as string | null)}
               >
                 {availableFloors.map((floor) => (
                   <OptionStyle key={floor} value={floor}>
