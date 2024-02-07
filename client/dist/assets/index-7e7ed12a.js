@@ -1398,14 +1398,14 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
     width:180px;
     height:38px;
 
-    .css-fliaa7-MuiInputBase-root-MuiOutlinedInput-root{
+    .MuiInputBase-root{
         border-radius:8px;
         height:38px;
         color:${({theme:e})=>e.palette.pf.color};
     }
-    .css-i4bv87-MuiSvgIcon-root{
+    .MuiSvgIcon-root{
         color:${({theme:e})=>e.palette.pf.color};
-    }
+    }  
 `,ag=He(Xn)`
     width:160px;
     color:${({theme:e})=>e.palette.pf.color};
