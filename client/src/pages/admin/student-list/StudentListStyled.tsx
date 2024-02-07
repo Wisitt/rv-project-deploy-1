@@ -75,6 +75,7 @@ tr {
     text-align: center;
     padding: 10px;
     border: none !important;
+
   }
   td {
     z-index: 1 !important;

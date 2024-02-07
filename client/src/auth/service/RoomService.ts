@@ -65,8 +65,9 @@ const RoomService = {
     },
     getRoomTypeById: async (roomtypeId: string) => {
         const response = await axiosInstance.get(`/admin/room/getroomtype/${roomtypeId}`, {
+            
         });
-        return response.data;
+        return response.data.room_types;
     },
 
     
@@ -105,6 +106,15 @@ const RoomService = {
     
     getReservedData: async () => {
         const response = await axiosInstance.get('/dashboard/getreserveddata');
+        return response.data;
+    },
+    getdaudata: async (token: string) => {
+        const response = await axiosInstance.get('/dashboard/getdaudata', {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
         return response.data;
     },
     getAllSubject: async ({ page, pageSize }: GetAllRoomsParams) => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { DialogContent, DialogActions } from "@mui/material";
+import {  toast } from 'sonner'
 
 import {
   Checkbox,
@@ -122,7 +123,9 @@ const SubjectList: React.FC = () => {
     const [userOptions, setUserOptions] = useState<{ id: string; firstname: string }[]>([]);
     const [roomnumber, setRoomnumber] = useState<{ room_id: string; room_number: string }[]>([]);
     const [selectedFloor, setSelectedFloor] = useState<string | null>(null);
-    const availableFloors = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const [availableFloorsApi, setRoomFloorsApi] = useState<string[]>([]);
+
     const [selectedStartTime] =
     useState<dayjs.Dayjs | null>(dayjs().startOf("day").hour(8));
   const [selectedEndTime] = useState<dayjs.Dayjs | null>(
@@ -150,6 +153,20 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
     const hour = value.hour();
     return hour < 9 || hour > 18;
   };
+
+  useEffect(() => {
+    const fetchRoomLevel = async () => {
+      try {
+        const response = await axiosInstance.get(`/admin/room/getroomlevel`);
+        setRoomFloorsApi(response.data.roomlevel);
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+      }
+    };
+    
+    fetchRoomLevel();
+    
+  }, []); 
     useEffect(() => {
         const fetchRoomNumber = async () => {
           if (selectedFloor) {
@@ -264,33 +281,28 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
         
             const responseData = response.data;
 
-            if (responseData.message === "Class added successfully") {
+            if (response.status === 201) {
                 setTimetableData([...timetableData, responseData.newClass]);
-                console.log("Class added successfully");
+                handleCloseAddClassDialog();
+                setAddClass({
+                    subject_id: "",
+                    day_of_week: "",
+                    start_time: "",
+                    end_time: "",
+                    room_id: "",
+                });
+                toast.success("Class added successfully");
             } else {
                 console.log("Error:", responseData.error);
+                toast.error(responseData.message);
             }
-            handleCloseAddClassDialog();
-        
-            setAddClass({
-                subject_id: "",
-                day_of_week: "",
-                start_time: "",
-                end_time: "",
-                room_id: "",
-            });
             await fetchSubjectList();
-            } catch (error) {
+        } catch (error) {
             console.error("Error creating class:", error);
-            }
-        };
-    const handleInputChangeAddClass= (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setAddClass((prevUser) => ({
-        ...prevUser,
-        [name]: value,
-        }));
+            toast.error("Error data or room is not available for the new class");
+        }
     };
+
 
     return (
         <>
@@ -525,7 +537,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                 {editingSubject && (
                     <>
                     {/* <FormControl>
-                        <FormLabel>Id</FormLabel>
+                        <FormLabel required>Id</FormLabel>
                         <Input
                         autoFocus
                         required
@@ -537,7 +549,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         />
                     </FormControl> */}
                     <FormControl>
-                        <FormLabel>Number</FormLabel>
+                        <FormLabel required>Number</FormLabel>
                         <Input
                         autoFocus
                         required
@@ -549,7 +561,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         />
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Code</FormLabel>
+                        <FormLabel required>Code</FormLabel>
                         <Input
                         required
                         name="subject_code"
@@ -560,7 +572,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         />
                     </FormControl>
                     <FormControl>
-                        <FormLabel>User</FormLabel>
+                        <FormLabel required>User</FormLabel>
                         <Select
                             required
                             color="neutral"
@@ -610,7 +622,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                 <Stack spacing={3}>
                 <>
                     <FormControl>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel required>Name</FormLabel>
                     <Input
                         autoFocus
                         required
@@ -622,7 +634,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                     />
                     </FormControl>
                     <FormControl>
-                    <FormLabel>Code</FormLabel>
+                    <FormLabel required>Code</FormLabel>
                     <Input
                         required
                         name="subject_code"
@@ -633,7 +645,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                     />
                     </FormControl>
                     <FormControl>
-                        <FormLabel>User ID</FormLabel>
+                        <FormLabel required>User ID</FormLabel>
                         <Select
                             required
                             color="neutral"
@@ -682,12 +694,12 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                 <Stack spacing={3}>
                 <>
                     <FormControl>
-                        <FormLabel>ชั้น</FormLabel>
+                        <FormLabel required>ชั้น</FormLabel>
                         <Select
                             placeholder="เลือกชั้น"
                             onChange={(_, value) => setSelectedFloor(value as string | null)}
                         >
-                            {availableFloors.map((floor) => (
+                            {availableFloorsApi.map((floor) => (
                             <Option key={floor} value={floor}>
                                 {floor}
                             </Option>
@@ -695,7 +707,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         </Select>
                     </FormControl>
                     <FormControl>
-                    <FormLabel>Room</FormLabel>
+                        <FormLabel required>Room</FormLabel>
                         <Select
                             required
                             color="neutral"
@@ -715,16 +727,24 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         </Select>
                     </FormControl>
                     <FormControl>
-                    <FormLabel>Day</FormLabel>
-                    <Input
-                        autoFocus
-                        required
-                        name="day_of_week"
-                        value={AddClass.day_of_week}
-                        onChange={handleInputChangeAddClass}
-                        fullWidth
-                        size="lg"
-                    />
+                        <FormLabel required>Day</FormLabel>
+                        <Select
+                            required
+                            color="neutral"
+                            variant="soft"
+                            name="day_of_week"
+                            value={AddClass.day_of_week}
+                            onChange={(_, value) =>
+                                setAddClass({ ...AddClass, day_of_week: value as string })
+                            }
+                            size="lg"
+                        >
+                            {daysOfWeek.map((day) => (
+                                <Option key={day} value={day}>
+                                    {day}
+                                </Option>
+                            ))}
+                        </Select>
                     </FormControl>
                     <FormControl>
                     <LocalizationProvider dateAdapter={NewAdapter} adapterLocale="th">
@@ -740,7 +760,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         />
                         </DateTime>
                     </LocalizationProvider>
-                        {/* <FormLabel>Start Time</FormLabel>
+                        {/* <FormLabel required>Start Time</FormLabel>
                         <Input
                             required
                             name="start_time"
@@ -764,7 +784,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         />
                         </DateTime>
                     </LocalizationProvider>
-                        {/* <FormLabel>End Time</FormLabel>
+                        {/* <FormLabel required>End Time</FormLabel>
                         <Input
                             required
                             name="end_time"
@@ -775,7 +795,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         /> */}
                     </FormControl>
                     {/* <FormControl>
-                        <FormLabel>Subject ID</FormLabel>
+                        <FormLabel required>Subject ID</FormLabel>
                         <Input
                             required
                             name="subject_id"
@@ -799,783 +819,6 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
             </ModalDialog>
         </Modal>
         </HeadList>
-        {/* <TimetableContainer>
-            <TimetableHeader>TIME TABLE</TimetableHeader>
-            <TimetableTable>
-                <thead>
-                    <tr>
-                    <TimetableTh><b>Day/Period</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Monday</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Tuesday</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Wednesday</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Thursday</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Friday</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Saturday</b></TimetableTh>
-                    <TimetableTh colSpan={3}><b>Sunday</b></TimetableTh>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                    <TimetableTd rowSpan={3}><b>08:00 - 09:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "08:00:00" && classItem.end_time === "09:00:00") ? null : <b>08:00 - 09:00</b>}
-                    </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                        <TimetableTd rowSpan={3}><b>09:00 - 10:00</b></TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>   
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "09:00:00" && classItem.end_time === "10:00:00") ? null : <b>09:00 - 10:00</b>}
-                        </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                        <TimetableTd rowSpan={3}><b>10:00 - 11:00</b></TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>   
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "10:00:00" && classItem.end_time === "11:00:00") ? null : <b>10:00 - 11:00</b>}
-                        </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                        <TimetableTd rowSpan={3}><b>11:00 - 12:00</b></TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-                        <TimetableTd colSpan={3}>   
-                        {timetableData.map((classItem) => (
-                            <p key={classItem?.subject_id}>
-                            {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00" && (
-                                <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                            )}
-                            </p>
-                        ))}
-                        {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "11:00:00" && classItem.end_time === "12:00:00") ? null : <b>11:00 - 12:00</b>}
-                        </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                    <TimetableTd rowSpan={3}><b>12:00 - 13:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "12:00:00" && classItem.end_time === "13:00:00") ? null : <b>12:00 - 13:00</b>}
-                    </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                    <TimetableTd rowSpan={3}><b>13:00 - 14:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "13:00:00" && classItem.end_time === "14:00:00") ? null : <b>13:00 - 14:00</b>}
-                    </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                <tr>
-                    <TimetableTd rowSpan={3}><b>14:00 - 15:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "14:00:00" && classItem.end_time === "15:00:00") ? null : <b>14:00 - 15:00</b>}
-                    </TimetableTd>
-                </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                    <TimetableTd rowSpan={3}><b>15:00 - 16:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "15:00:00" && classItem.end_time === "16:00:00") ? null : <b>15:00 - 16:00</b>}
-                    </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                    <TimetableTd rowSpan={3}><b>16:00 - 17:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "16:00:00" && classItem.end_time === "17:00:00") ? null : <b>16:00 - 17:00</b>}
-                    </TimetableTd>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr>
-                    <TimetableTd rowSpan={3}><b>17:00 - 18:00</b></TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Monday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Monday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Tuesday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Tuesday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Wednesday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Wednesday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Thursday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Thursday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Friday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Friday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Saturday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Saturday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-                    <TimetableTd colSpan={3}>   
-                    {timetableData.map((classItem) => (
-                        <p key={classItem?.subject_id}>
-                        {classItem && classItem.day_of_week === "Sunday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00" && (
-                            <b className="text-danger">{`${formatTimeThai(classItem.start_time)} - ${formatTimeThai(classItem.end_time)}`}</b>
-                        )}
-                        </p>
-                    ))}
-                    {timetableData.some(classItem => classItem.day_of_week === "Sunday" && classItem.start_time === "17:00:00" && classItem.end_time === "18:00:00") ? null : <b>17:00 - 18:00</b>}
-                    </TimetableTd>
-                    </tr>
-                </tbody>
-            </TimetableTable>
-        </TimetableContainer> */}
         </>
     );
     };
