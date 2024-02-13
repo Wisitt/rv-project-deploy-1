@@ -7,7 +7,7 @@ export const DateTime = styled(Sheet)`
     color:${({ theme }) => theme.palette.common.white};
     border-color:${({ theme }) => theme.palette.common.white};
     background-color: ${({ theme }) => theme.palette.nav.bg};
-    width:180px;
+    width:200px;
     height:38px;
 
     .MuiInputBase-root{
@@ -17,7 +17,7 @@ export const DateTime = styled(Sheet)`
     }
     .MuiSvgIcon-root{
         color:${({ theme }) => theme.palette.pf.color};
-    }  
+    }   
 `;
 export const SelectStyle = styled(Select)`
     width:160px;

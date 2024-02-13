@@ -72,7 +72,7 @@ const ReportList: React.FC = () => {
     
     useEffect(() => {
         fetchReportList();
-    }, [fetchReportList]);
+    }, [fetchReportList,page, rowsPerPage]);
 
     return (
         <HeadList>
@@ -144,6 +144,9 @@ const ReportList: React.FC = () => {
                             <Checkbox
                                 checked={selectAllChecked}
                                 onChange={handleToggleSelectAll}
+                                color="primary"
+                                disabled={false}
+                                size="md"
                             />
                         </th>
                     </tr>
@@ -165,6 +168,9 @@ const ReportList: React.FC = () => {
                                 <Checkbox
                                     checked={selectedItems.includes(item.report_id)}
                                     onChange={() => handleToggleCheckbox(item.report_id)}
+                                    color="primary"
+                                    disabled={false}
+                                    size="md"
                                 />
                             </th>
                             </tr>
@@ -206,6 +212,13 @@ const ReportList: React.FC = () => {
 export default ReportList;
 
 const formatTimestamp = (timestamp: string | number): string => {
-    const date = new Date(typeof timestamp === 'string' ? parseInt(timestamp, 10) * 1000 : timestamp * 1000);
-    return `${date.toLocaleDateString()} : ${date.toLocaleTimeString()}`;
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
+
+

@@ -70,7 +70,7 @@ const StudentList: React.FC = () => {
   } = useStudentList();
   useEffect(() => {
     fetchUserList();
-  }, [fetchUserList]);
+  }, [fetchUserList, page, rowsPerPage]);
   interface Item {
     updated: boolean;
   }
@@ -186,6 +186,8 @@ const StudentList: React.FC = () => {
                         checked={selectedItems.includes(item.id)}
                         onChange={() => handleCheckboxChange(item.id)}
                         color="primary"
+                        disabled={false}
+                        size="md"
                       />
                     </th>
                     <th>

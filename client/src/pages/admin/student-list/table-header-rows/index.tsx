@@ -23,9 +23,7 @@ export const TableHeaderRows: React.FC<{searchTerm: string, handleChange: (e: Re
   <tr>
     <th></th>
     <th></th>
-    <th></th>
-    <th></th>
-    <th>
+    <th colSpan={4}>
       <Input
         disabled={false}
         size="md"
@@ -36,12 +34,13 @@ export const TableHeaderRows: React.FC<{searchTerm: string, handleChange: (e: Re
       />
     </th>
     <th></th>
-    <th></th>
     <th>
       <Checkbox
         checked={selectAll}
         onChange={handleSelectAll}
         color="primary"
+        disabled={false}
+        size="md"
       />
     </th>
     <th></th>

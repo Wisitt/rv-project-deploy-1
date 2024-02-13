@@ -37,7 +37,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import NewAdapter from "../../user/room/AdapterDay";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DateTime } from "../../../pages/user/room/ReservationStyled";
+import { DateTime } from "../../user/room/ReservationStyled";
 
 // import styled from 'styled-components';
 
@@ -374,6 +374,8 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         checked={selectAll}
                         onChange={handleSelectAll}
                         color="primary"
+                        disabled={false}
+                        size="md"
                     />
                     </th>
                     <th></th>
@@ -391,6 +393,8 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         checked={selectedItems.includes(item.subject_id)}
                         onChange={() => handleCheckboxChange(item.subject_id)}
                         color="primary"
+                        disabled={false}
+                        size="md"
                         />
                     </th>
                     <th>
