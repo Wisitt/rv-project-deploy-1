@@ -1,6 +1,6 @@
 import React,{ useEffect }from "react";
 import useReportAdminList from "./useReportList";
-import { Button, Chip, Sheet, Table, Checkbox} from '@mui/joy';
+import { Button, Chip, Sheet, Table, Checkbox,Tooltip } from '@mui/joy';
 import {
   Tbody,
   Theader,
@@ -87,16 +87,6 @@ const ReportList: React.FC = () => {
                         "--TableRow-hoverBackground": "rgba(0 0 0 / 0.08)",
                         height: 331,
                         overflow: "auto",
-                        background: (
-                        theme
-                        ) => `linear-gradient(${theme.vars.palette.background.surface} ,
-                                0 100%`,
-                        backgroundSize:
-                        "40px calc(100% - var(--TableCell-height)), 40px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height))",
-                        backgroundRepeat: "no-repeat",
-                        backgroundAttachment: "local, local, scroll, scroll",
-                        backgroundPosition:
-                        "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
                         backgroundColor: "nav.bg",
                     }}
                     >
@@ -125,13 +115,13 @@ const ReportList: React.FC = () => {
                     >
                 <Theader >
                     <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Report</th>
-                        <th>Room</th>
-                        <th>Date time</th>
-                        <th>Status</th>
-                        <th>Select</th>
+                        <th style={{width:50}}>No</th>
+                        <th style={{width:150}}>Name</th>
+                        <th style={{width:150}}>Room</th>
+                        <th style={{width:150}}>Report</th>
+                        <th style={{width:150}}>Date time</th>
+                        <th style={{width:150}}>Status</th>
+                        <th style={{width:50}}>Select</th>
                     </tr>
                     <tr>
                         <th></th>
@@ -155,10 +145,26 @@ const ReportList: React.FC = () => {
                         {reportList.map((item,index) => (
                             <tr className="text-center" key={item.id || index}>
                             <th>{(page - 1) * rowsPerPage + index + 1}</th>
-                            <th>{item.fullname}</th>
-                            <th>{item.room_number}</th>
-                            <th>{item.report_detail}</th>
-                            <th>{formatTimestamp(item.timestamp)}</th>
+                            <th>
+                                <Tooltip  title={item.fullname} arrow>
+                                            <span>{item.fullname}</span>
+                                </Tooltip >
+                            </th>
+                            <th>
+                                <Tooltip  title={item.room_number} arrow>
+                                            <span>{item.room_number}</span>
+                                </Tooltip >
+                            </th>
+                            <th>
+                                <Tooltip  title={item.report_detail} arrow>
+                                            <span>{item.report_detail}</span>
+                                </Tooltip >
+                            </th>
+                            <th>
+                                <Tooltip  title={formatTimestamp(item.timestamp)} arrow>
+                                            <span>{formatTimestamp(item.timestamp)}</span>
+                                </Tooltip >
+                            </th>
                             <th>
                                 <Chip color={item.report_status === 0 ? "danger" : item.report_status === 1 ? "warning" : "success"} variant="solid" size="lg">
                                     {item.report_status === 0 ? "Cancel" : item.report_status === 1 ? "In Progress" : "Approve"}

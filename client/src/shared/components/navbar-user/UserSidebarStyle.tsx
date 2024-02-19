@@ -1,6 +1,6 @@
 
 import { Box, Breadcrumbs, Card, Sheet,Menu } from '@mui/joy';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { styled } from '@mui/system';
 
 
@@ -69,7 +69,7 @@ export const LayoutUser = styled(Sheet)`
   background-size: cover;
   background-position: center;
 `;
-export const MenuItemLinksNav = styled(Link)`
+export const MenuItemLinksNav = styled(NavLink)`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,12 +77,28 @@ export const MenuItemLinksNav = styled(Link)`
   font-size: 18px;
   text-decoration: none;
   color: #D0D5DC;
-  transition: all 0.2s ease;
   border-radius: 20px;
-
+  margin:9px;
+  padding:10px;
+  border:1px solid transparent;
   &:hover {
     .MuiTypography-root {
       color:${({ theme }) => theme.palette.main.bgStyle};
     }
+    transform:scale(1.1);
+    border-color: ${({ theme }) => theme.palette.main.bgStyDark};
+  }
+  &.active {
+    .icon-active {
+      display:block;
+    };
+    background-color: ${({ theme }) => theme.palette.main.bgStyLight};
+  }
+  &:active {
+    transform:scale(0.9);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  .icon-active{
+    display:none;
   }
 `;

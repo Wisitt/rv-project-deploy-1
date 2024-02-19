@@ -16,6 +16,7 @@ import {
   Select,
   Option,
   SvgIcon,
+  Tooltip
 } from "@mui/joy";
 import DeleteForever from "@mui/icons-material/DeleteForever";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
@@ -100,16 +101,6 @@ const StudentList: React.FC = () => {
             "--TableRow-hoverBackground": "rgba(0 0 0 / 0.08)",
             height: 385,
             overflow: "auto",
-            background: (
-              theme
-            ) => `linear-gradient(${theme.vars.palette.background.surface} ,
-                      0 100%`,
-            backgroundSize:
-              "40px calc(100% - var(--TableCell-height)), 40px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height))",
-            backgroundRepeat: "no-repeat",
-            backgroundAttachment: "local, local, scroll, scroll",
-            backgroundPosition:
-              "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
             backgroundColor: "nav.bg",
           }}
         >
@@ -176,11 +167,31 @@ const StudentList: React.FC = () => {
                         />
                       )}
                     </th>
-                    <th style={rowStyle(item)}>{item.firstname}</th>
-                    <th style={rowStyle(item)}>{item.lastname}</th>
-                    <th style={rowStyle(item)}>{item.pin}</th>
-                    <th style={rowStyle(item)}>{item.citizen_id}</th>
-                    <th style={rowStyle(item)}>{item.account_type}</th>
+                    <th>
+                      <Tooltip  title={item.firstname} arrow>
+                        <span>{item.firstname}</span>
+                      </Tooltip> 
+                    </th>
+                    <th>
+                      <Tooltip  title={item.lastname} arrow>
+                        <span>{item.lastname}</span>
+                      </Tooltip> 
+                    </th>
+                    <th>
+                      <Tooltip  title={item.pin} arrow>
+                        <span>{item.pin}</span>
+                      </Tooltip> 
+                    </th>
+                    <th>
+                      <Tooltip  title={item.citizen_id} arrow>
+                        <span>{item.citizen_id}</span>
+                      </Tooltip> 
+                    </th>
+                    <th>
+                      <Tooltip  title={item.account_type} arrow>
+                        <span>{item.account_type}</span>
+                      </Tooltip> 
+                    </th>
                     <th>
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
@@ -337,6 +348,7 @@ const StudentList: React.FC = () => {
                       onChange={handleInputEditChange}
                       fullWidth
                       size="lg"
+                      color="primary"
                     />
                   </FormControl>
                   <FormControl>
@@ -348,6 +360,7 @@ const StudentList: React.FC = () => {
                       onChange={handleInputEditChange}
                       fullWidth
                       size="lg"
+                      color="primary"
                     />
                   </FormControl>
                   <FormControl>
@@ -359,6 +372,7 @@ const StudentList: React.FC = () => {
                       onChange={handleInputEditChange}
                       fullWidth
                       size="lg"
+                      color="primary"
                     />
                   </FormControl>
                   <FormControl>
@@ -370,6 +384,7 @@ const StudentList: React.FC = () => {
                       onChange={handleInputEditChange}
                       fullWidth
                       size="lg"
+                      color="primary"
                     />
                   </FormControl>
                   <FormControl>
@@ -447,6 +462,7 @@ const StudentList: React.FC = () => {
                     onChange={handleInputChangePin}
                     fullWidth
                     size="lg"
+                    color="primary"
                   />
                   {pinIdError && (
                     <p style={{ color: "red" }}>
@@ -464,6 +480,7 @@ const StudentList: React.FC = () => {
                     onChange={handleInputChangeCitizen}
                     fullWidth
                     size="lg"
+                    color="primary"
                   />
                   {citizenIdError && (
                     <p style={{ color: "red" }}>
@@ -480,6 +497,7 @@ const StudentList: React.FC = () => {
                     onChange={handleInputChange}
                     fullWidth
                     size="lg"
+                    color="primary"
                   />
                 </FormControl>
                 <FormControl>
@@ -491,12 +509,15 @@ const StudentList: React.FC = () => {
                     onChange={handleInputChange}
                     fullWidth
                     size="lg"
+                    color="primary"
                   />
                 </FormControl>
                 <FormControl>
                   <FormLabel required>AccountType</FormLabel>
                   <Select
                     defaultValue="select"
+                    variant="solid"
+                    color="primary"
                     required
                     name="account_type"
                     value={AddUser.account_type}

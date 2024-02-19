@@ -4,7 +4,8 @@ import {
   Sheet,
   Table,
   Checkbox,
-  Chip
+  Chip,
+  Tooltip
 } from "@mui/joy";
 import {
   Tbody,
@@ -97,16 +98,6 @@ const ReservedList: React.FC = () => {
                         "--TableRow-hoverBackground": "rgba(0 0 0 / 0.08)",
                         height: 346,
                         overflow: "auto",
-                        background: (
-                        theme
-                        ) => `linear-gradient(${theme.vars.palette.background.surface} ,
-                                0 100%`,
-                        backgroundSize:
-                        "40px calc(100% - var(--TableCell-height)), 40px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height))",
-                        backgroundRepeat: "no-repeat",
-                        backgroundAttachment: "local, local, scroll, scroll",
-                        backgroundPosition:
-                        "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
                         backgroundColor: "nav.bg",
                     }}
                     >
@@ -135,17 +126,17 @@ const ReservedList: React.FC = () => {
                     >
                     <Theader>
                       <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Room</th>
-                        <th>Account Type</th>
-                        <th>Reason</th>
-                        <th>Status</th>
-                        <th>Reservation Date</th>
+                        <th style={{ width: 150 }}>No</th>
+                        <th style={{ width: 200 }}>Name</th>
+                        <th style={{ width: 150 }}>Room</th>
+                        <th style={{ width: 150 }}>Account Type</th>
+                        <th style={{ width: 150 }}>Reason</th>
+                        <th style={{ width: 150 }}>Status</th>
+                        <th style={{ width: 150 }}>Reservation Date</th>
                         {/* <th>Date Time</th> */}
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Action</th>
+                        <th style={{ width: 150 }}>Start Time</th>
+                        <th style={{ width: 150 }}>End Time</th>
+                        <th style={{ width: 150 }}>Action</th>
                       </tr>
                       <tr>
                         <th></th>
@@ -172,22 +163,54 @@ const ReservedList: React.FC = () => {
                         {Array.isArray(reservedtList) && reservedtList.map((item, index) => (
                             <tr className="text-center" key={item.id || index}>
                             <th>{(page - 1) * rowsPerPage + index + 1}</th>
-                            <th>{item.fullname}</th>
-                            <th>{item.room_number}</th>
-                            <th>{item.account_type}</th>
-                            <th>{item.reservation_reason}</th>
                             <th>
-                              <Chip color={item.reservation_status === "Cancel" ? "danger" :
-                              item.reservation_status === "In progress"? "warning": "success"}
-                              variant="solid" 
-                              size="lg">
-                                {item.reservation_status}
-                              </Chip>
+                            <Tooltip  title={item.fullname} arrow>
+                                            <span>{item.fullname}</span>
+                            </Tooltip >
                             </th>
-                            <th>{formatTimestamp(item.reservation_date)}</th>
+                            <th>
+                            <Tooltip  title={item.room_number} arrow>
+                                            <span>{item.room_number}</span>
+                            </Tooltip >
+                            </th>
+                            <th>
+                            <Tooltip  title={item.account_type} arrow>
+                                            <span>{item.account_type}</span>
+                            </Tooltip >
+                            </th>
+                            <th>
+                            <Tooltip  title={item.reservation_reason} arrow>
+                                            <span>{item.reservation_reason}</span>
+                            </Tooltip >
+                            </th>
+                            <th>
+                            <Tooltip  title={item.reservation_status} arrow>
+                                <span>
+                                  <Chip color={item.reservation_status === "Cancel" ? "danger" :
+                                    item.reservation_status === "In progress"? "warning": "success"}
+                                    variant="solid" 
+                                    size="lg">
+                                    {item.reservation_status}
+                                  </Chip>
+                                </span>
+                            </Tooltip >
+                            </th>
+                            <th>
+                            <Tooltip  title={formatTimestamp(item.reservation_date)} arrow>
+                                            <span>{formatTimestamp(item.reservation_date)}</span>
+                            </Tooltip >
+                            </th>
                             {/* <th>{formatTimestamp(item.timestamp)}</th> */}
-                            <th>{item.start_time}</th>
-                            <th>{item.end_time}</th>
+                            <th>
+                            <Tooltip  title={item.start_time} arrow>
+                                            <span>{item.start_time}</span>
+                            </Tooltip >
+                            </th>
+                            <th>
+                            <Tooltip  title={item.end_time} arrow>
+                                            <span>{item.end_time}</span>
+                            </Tooltip >
+                            </th>
                             <th>
                               <Checkbox
                                   checked={selectedItems.includes(item.reservation_id)}

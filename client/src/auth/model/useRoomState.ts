@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RoomListActionItem, RoomListItem } from "./room-list";
+import { RoomListActionItem, RoomListItem } from "../model/room-list";
 import { SubjectItemList } from "./subject";
 
 const useRoomState = () => {

@@ -17,7 +17,8 @@ import {
   Box,
   DialogTitle,
   Select,
-  Option
+  Option,
+  Tooltip
 } from "@mui/joy";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 import {
@@ -37,7 +38,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import NewAdapter from "../../user/room/AdapterDay";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { DateTime } from "../../user/room/ReservationStyled";
+import { DateTime } from "../../../pages/user/room/ReservationStyled";
 
 // import styled from 'styled-components';
 
@@ -318,16 +319,6 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                 "--TableRow-hoverBackground": "rgba(0 0 0 / 0.08)",
                 height: 370,
                 overflow: "auto",
-                background: (
-                theme
-                ) => `linear-gradient(${theme.vars.palette.background.surface} ,
-                                    0 100%`,
-                backgroundSize:
-                "40px calc(100% - var(--TableCell-height)), 40px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height))",
-                backgroundRepeat: "no-repeat",
-                backgroundAttachment: "local, local, scroll, scroll",
-                backgroundPosition:
-                "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
                 backgroundColor: "nav.bg",
             }}
             >
@@ -356,14 +347,14 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
             >
                 <Theader>
                 <tr>
-                    <th style={{ width: 30 }}>No</th>
+                    <th style={{ width: 50 }}>No</th>
                     <th style={{ width: 100 }}>Name</th>
                     <th style={{ width: 100 }}>Code</th>
                     <th style={{ width: 100 }}>User</th>
-                    <th style={{ width: 40 }}>Select</th>
+                    <th style={{ width: 100 }}>Select</th>
                     <th style={{ width: 230 }}>Action</th>
                 </tr>
-                <tr>
+                <tr> 
                     <th></th>
                     <th></th>
                     <th></th>
@@ -385,9 +376,21 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                 {listItems.map((item, index) => (
                     <tr className="text-center" key={item.id || index}>
                     <th>{(page - 1) * rowsPerPage + index + 1}</th>
-                    <th>{item.subject_name}</th>
-                    <th>{item.subject_code}</th>
-                    <th>{item.firstname}</th>
+                    <th>
+                    <Tooltip  title={item.subject_name} arrow>
+                        <span>{item.subject_name}</span>
+                    </Tooltip>
+                    </th>
+                    <th>
+                    <Tooltip  title={item.subject_code} arrow>
+                        <span>{item.subject_code}</span>
+                    </Tooltip>
+                    </th>
+                    <th>
+                    <Tooltip  title={item.firstname} arrow>
+                        <span>{item.firstname}</span>
+                    </Tooltip>
+                    </th>
                     <th>
                         <Checkbox
                         checked={selectedItems.includes(item.subject_id)}
@@ -562,6 +565,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         onChange={handleInputEditChangeSubject}
                         fullWidth
                         size="lg"
+                        color="primary"
                         />
                     </FormControl>
                     <FormControl>
@@ -573,14 +577,15 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         onChange={handleInputEditChangeSubject}
                         fullWidth
                         size="lg"
+                        color="primary"
                         />
                     </FormControl>
                     <FormControl>
                         <FormLabel required>User</FormLabel>
                         <Select
+                        variant="solid"
+                        color="primary"
                             required
-                            color="neutral"
-                            variant="soft"
                             name="user_id"
                             value={editingSubject.user_id}
                             onChange={(_, value) =>
@@ -635,6 +640,7 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         onChange={handleInputChangeSubject}
                         fullWidth
                         size="lg"
+                        color="primary"
                     />
                     </FormControl>
                     <FormControl>
@@ -646,14 +652,15 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                         onChange={handleInputChangeSubject}
                         fullWidth
                         size="lg"
+                        color="primary"
                     />
                     </FormControl>
                     <FormControl>
                         <FormLabel required>User ID</FormLabel>
                         <Select
+                        variant="solid"
+                        color="primary"
                             required
-                            color="neutral"
-                            variant="soft"
                             name="user_id"
                             value={AddSubject.user_id}
                             onChange={(_, value) =>
@@ -700,6 +707,8 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                     <FormControl>
                         <FormLabel required>ชั้น</FormLabel>
                         <Select
+                        variant="solid"
+                        color="primary"
                             placeholder="เลือกชั้น"
                             onChange={(_, value) => setSelectedFloor(value as string | null)}
                         >
@@ -713,9 +722,9 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                     <FormControl>
                         <FormLabel required>Room</FormLabel>
                         <Select
+                            variant="solid"
+                            color="primary"
                             required
-                            color="neutral"
-                            variant="soft"
                             name="room_id"
                             value={AddClass.room_id}
                             onChange={(_, value) =>
@@ -733,9 +742,9 @@ const handleEndTimeChange = (value: dayjs.Dayjs | null) => {
                     <FormControl>
                         <FormLabel required>Day</FormLabel>
                         <Select
+                            variant="solid"
+                            color="primary"
                             required
-                            color="neutral"
-                            variant="soft"
                             name="day_of_week"
                             value={AddClass.day_of_week}
                             onChange={(_, value) =>

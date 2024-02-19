@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const {
+  default: flattenColorPalette,
+// eslint-disable-next-line no-undef
+} = require("tailwindcss/lib/util/flattenColorPalette");
+ 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -7,11 +13,36 @@ export default {
     "./src/**/*.scss",
     "./src/**/*.css",
     'node_modules/preline/dist/*.js',
+    "./src/**/*.{ts,tsx}"
   ],
-  
+  darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        scroll:
+          "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+      },
+      keyframes: {
+        scroll: {
+          to: {
+            transform: "translate(calc(-50% - 0.5rem))",
+          },
+        },
+      },
   },
-  plugins: [],
+  plugins: [addVariablesForColors],
+  }
 }
 
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function addVariablesForColors({ addBase, theme }) {
+  let allColors = flattenColorPalette(theme("colors"));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+ 
+  addBase({
+    ":root": newVars,
+  });
+}

@@ -99,7 +99,6 @@ export const Tbody = styled('tbody')`
       text-align: center;
       vertical-align: middle;
       font-weight: 500;
-      border:0.2px solid ${({ theme }) => theme.palette.background.backdrop};
     }
   }
 `;

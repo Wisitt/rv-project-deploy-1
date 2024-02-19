@@ -1,167 +1,286 @@
-import React from "react";
 import { useColorScheme } from "@mui/joy/styles";
-import { Typography, Sheet } from "@mui/joy";
-import "./index.scss";
+import { Button, Sheet, Typography, Grid } from "@mui/joy";
+import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
+import HomeStyle from "./Homestyle";
+import React from "react";
+import { InfiniteMovingCards } from "../../components/ui/infinite-moving-cards";
 
-const commonStyles = {
-    color: "hsl(0 0% 100% / 0.2)",
-    backgroundClip: "text",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "0% 100%",
-    backgroundImage: "linear-gradient(135deg, #8A2BE2, #4B0082);",
-    animation: "scroll-reveal linear forwards",
-    animationTimeline: "view(y)",
-    animationRange: "contain",
+export function InfiniteMovingCardsDemo() {
+  return (
+    <div className="h-[20rem] w-max rounded-md flex flex-col items-center justify-center relative ">
+      <InfiniteMovingCards
+        items={testimonials}
+        direction="right"
+        speed="slow"
+      />
+    </div>
+  );
+}
+
+const testimonials = [
+  {
+    img: "https://avatars.githubusercontent.com/Wisitt",
+    name: "Wisit Moondet",
+    title: "FrontEnd",
+    githubLink: "https://github.com/Wisitt",
+  },
+  {
+    img: "https:/avatars.githubusercontent.com/heroclik",
+    name: "Theeraporn Promsorn",
+    title: "Backend",
+    githubLink: "https://github.com/heroclik",
+  },
+  {
+    img: "https:/avatars.githubusercontent.com/Jatuchok",
+    name: "Jatuchok Chuma",
+    title: "Backend",
+    githubLink: "https://github.com/Jatuchok",
+  },
+  {
+    img: "https:/avatars.githubusercontent.com/suchadatammajong",
+    name: "Suchada Tammajong",
+    title: "Lead Team",
+    githubLink: "https://github.com/suchadatammajong",
+  },
+];
+const GlassButton = styled(Button)`
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.375rem;
+  border-radius: 50px;
+  backdrop-filter: blur(15px);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid white;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    background: rgba(176, 37, 237, 0.19);
+  }
+
+  &:active {
+    transform: translate(-50%, -50%) scale(0.9);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
 };
-const HomeUser: React.FC = () => {
-    const { mode } = useColorScheme();
+`;
+const BackgroundIndex = () => {
+  return (
+    <div className="area">
+      <ul className="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+  );
+};
 
-    return (
-        <>
-            <div
-                className="py-24 sm:py-32 md:py-40 relative"
-                style={{
-                width: "100%",
-                height: "100vh",
-                position: "relative",
-                ...(mode === "dark"
-                    ? { background: "linear-gradient(to bottom, #020420, #0F172A)" }
-                    : { background: "#AA96DA" }),
-                padding: 5,
-                }}
+const HomeUser: React.FC = () => {
+  const { mode } = useColorScheme();
+  const navigate = useNavigate();
+
+  const handleReserveClick = () => {
+    navigate("/user/room-user");
+  };
+
+  return (
+    <div style={{ height: "100vh", overflowX: "auto" }}>
+      <div
+        className="py-24 sm:py-32 md:py-40 relative"
+        style={{
+          width: "100%",
+          height: "100vh",
+          position: "relative",
+          paddingTop: "80px",
+          ...(mode === "dark"
+            ? { background: "linear-gradient(to bottom, #020420, #0F172A)" }
+            : { background: "linear-gradient(to bottom, #AA96DA,#6962AD)" }),
+          padding: 5,
+          zIndex: 1,
+        }}
+      >
+        {BackgroundIndex()}
+        <HomeStyle ></HomeStyle>
+        <GlassButton variant="outlined" onClick={handleReserveClick}>
+          Reserve
+        </GlassButton>
+      </div>
+      <Sheet
+        sx={{
+          ...(mode === "dark"
+            ? { background: " #080D1A" }
+            : { background: "#fff" }),
+          padding: "calc(40px + 5%)",
+          marginTop: "0",
+          zIndex: "1",
+          minHeight: "700px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          level="h2"
+          style={{ marginBottom: "1rem", fontWeight: "bold" }}
+        >
+          Welcome to Room Reservation System
+        </Typography>
+        <Typography level="body-lg" style={{ marginBottom: "1rem" }}>
+          Our room reservation system provides a seamless and efficient way for
+          students and faculty to reserve classrooms at RMUTP. Experience the
+          convenience of booking rooms for various activities, ensuring a smooth
+          and organized process for academic and extracurricular events.
+        </Typography>
+        <Typography
+          level="h3"
+          style={{ marginBottom: "1rem", marginTop: "5rem" }}
+        >
+          Benefits
+        </Typography>
+        <ul style={{ paddingLeft: "20px" }}>
+          <Typography level="body-lg">
+            Efficient room allocation for classes and events
+          </Typography>
+          <Typography level="body-lg">
+            Easy access to real-time availability of classrooms
+          </Typography>
+          <Typography level="body-lg">
+            Streamlined process for both students and faculty
+          </Typography>
+          <Typography level="body-lg">
+            Enhanced organization and scheduling of academic and extracurricular
+            activities
+          </Typography>
+        </ul>
+      </Sheet>
+      <Sheet
+        sx={{
+          ...(mode === "dark"
+            ? { background: " #0F172A" }
+            : { background: "linear-gradient(to bottom, #AA96DA,#6962AD)" }),
+          padding: 5,
+          marginTop: "0",
+          zIndex: "1",
+          height: "400px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          "@media (max-width: 768px)": {
+            height: "auto",
+          },
+        }}
+      >
+        <div className="d-flex justify-content-center align-items-center flex-column">
+          <Typography
+            level="h4"
+            style={{ marginTop: "1rem", fontWeight: "bold",color: '#fff'}}
+          >
+            Developer Team
+          </Typography>
+          <div>{InfiniteMovingCardsDemo()}</div>
+        </div>
+      </Sheet>
+
+      <Sheet
+        sx={{
+          ...(mode === "dark"
+            ? { background: "linear-gradient(to bottom, #080D1A, #080D1A)" }
+            : { background: "linear-gradient(to bottom, #fff, #fff,)" }),
+          padding: 5,
+          height: "800px",
+          "@media (max-width: 768px)": {
+            height: "auto",
+          },
+        }}
+      >
+        <section
+          className="d-flex flex-column justify-center align-items-center text-center m-0"
+          style={{ paddingBlock: "clamp(5rem, 25vh, 0.5rem)" }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "10%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center",
+              color: "white",
+            }}
+          >
+            <Typography
+              level="h4"
+              style={{
+                marginBottom: "1rem",
+                marginTop: "8rem",
+                fontWeight: "bold",
+              }}
             >
-                <Typography
-                sx={{
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    position: "absolute",
-                    fontSize: "4rem",
-                }}
-                >
-                Reservation Room
-                </Typography>
-            </div>
-            <Sheet
-                sx={{
-                ...(mode === "dark"
-                    ? { background: " #080D1A" }
-                    : { background: "#080D1A" }),
-                padding: 5,
-                marginTop: "0",
-                zIndex: "1",
-                height: "800px",
-                }}
-            >
-                <section
-                className="d-flex flex-column justify-center align-items-center text-center m-0"
-                style={{ paddingBlock: "clamp(5rem, 25vh, 0.5rem)" }}
-                >
-                <Typography
-                    level="h1"
-                    sx={{
-                    ...commonStyles,
-                    animationRangeStart: "cover 45vh",
-                    animationRangeEnd: "cover 50vh",
-                    }}
-                >
-                    Reservation Room
-                </Typography>
-                <Typography
-                    level="title-md"
-                    sx={{
-                    maxWidth: "100ch",
-                    ...commonStyles,
-                    animationRangeStart: "cover 55vh",
-                    animationRangeEnd: "cover 65vh",
-                    }}
-                >
-                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Mollitia nam sit fugiat quis. Ullam non id necessitatibus, tempore sint dolore.
-                </Typography>
-                <Typography
-                    level="title-md"
-                    sx={{
-                    maxWidth: "90ch",
-                    ...commonStyles,
-                    animationRangeStart: "cover 60vh",
-                    animationRangeEnd: "cover 70vh",
-                    }}
-                >
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Perspiciatis?
-                </Typography>
-                </section>
-            </Sheet>
-            <Sheet
-                sx={{
-                ...(mode === "dark"
-                    ? { background: "linear-gradient(to bottom, #080D1A, #101726)" }
-                    : { background: "#fff" }),
-                padding: 5,
-                }}
-            >
-                <Typography>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quae ratione
-                odit maxime natus dolor deleniti! Aperiam quos eaque consequatur
-                maiores corrupti sequi architecto illo recusandae dolorem. Aliquam
-                tempore blanditiis dicta esse autem quasi labore debitis ipsam quas
-                dolorem assumenda accusantium ab, inventore velit illo quos veritatis
-                voluptatum. Culpa ipsa soluta nobis officia voluptatem odit itaque
-                obcaecati unde tempora laborum eveniet repellendus, sapiente facere
-                atque suscipit illum nostrum quibusdam, corporis harum vero ipsam
-                reprehenderit consectetur. Consequatur modi, numquam consectetur fuga
-                architecto neque nam illo est aliquam perspiciatis nobis facere?
-                Provident maiores saepe dolorum soluta id dolores molestias nemo illo
-                iste accusamus libero, harum ea ducimus laboriosam sapiente natus
-                incidunt architecto quae, totam labore unde cupiditate sint deserunt
-                commodi? Atque architecto at voluptates? Pariatur, alias. Nemo eum
-                dicta praesentium magnam ut, quis facere maxime nihil eos. Totam, ex
-                unde! Fugit, a. Nobis, debitis rerum! Atque vel hic soluta laborum
-                laboriosam necessitatibus, perspiciatis sapiente minima, non dolores
-                ad ratione deleniti dolor, repudiandae error facere. Tempora ipsam
-                cupiditate ex facilis veniam quibusdam placeat recusandae. Saepe
-                ratione modi consequatur voluptatem eos, neque officia sequi
-                doloremque nobis unde quaerat libero, est non tempore quam
-                perspiciatis alias repellendus aliquam obcaecati velit accusamus
-                dignissimos esse. Dolore hic ullam quisquam at praesentium porro
-                molestiae obcaecati beatae quidem, eligendi vero asperiores. Modi
-                blanditiis ratione esse facere ea deleniti odit aliquam libero rerum,
-                illum explicabo molestias laboriosam inventore quia pariatur enim quis
-                aspernatur ducimus. Maiores, suscipit. Deserunt nemo aspernatur,
-                impedit, autem, nostrum accusantium magni quasi expedita perspiciatis
-                officia repudiandae. Atque consequatur incidunt magni error, voluptate
-                corrupti nam sequi. Alias nisi vitae architecto esse nam! Totam veniam
-                laboriosam quibusdam dolore consequuntur! Iste deleniti soluta
-                aspernatur molestias ab quos maxime atque eaque fugit. Culpa sapiente
-                libero aliquam voluptas, in officiis quas dolores eos. Nobis fugiat
-                fugit maiores consequuntur nam facilis corporis distinctio, maxime
-                modi a impedit rem facere. Ab facilis magnam tempora adipisci sint
-                praesentium, aperiam veniam molestias nisi nam quibusdam porro iste
-                placeat saepe quaerat aliquam! Aspernatur voluptates vitae cumque quod
-                assumenda nulla atque eius voluptate, iure accusamus veniam dolores
-                maiores temporibus excepturi. Aut sed atque, odit a quibusdam suscipit
-                accusamus animi ea asperiores recusandae, modi provident vero sapiente
-                cum? Atque explicabo quod accusamus illum nemo, nostrum,
-                necessitatibus mollitia similique ducimus aut corporis, molestiae
-                natus in sapiente magnam nesciunt? Beatae suscipit magni, ad quod
-                eligendi unde et aut esse nam minima iure molestias eaque deserunt
-                dolor pariatur adipisci voluptatum optio exercitationem culpa
-                doloremque veritatis. Maxime quo eos debitis eveniet aut sed
-                perspiciatis. Quam, a veniam et harum vero iste deserunt illum
-                excepturi similique sapiente impedit sunt quae tenetur aspernatur?
-                Voluptatem, fuga repellendus doloremque adipisci laboriosam sed?
-                Doloribus eos tempore pariatur facilis officiis excepturi minus ullam
-                ratione, cupiditate architecto, recusandae fugiat at fuga temporibus
-                nesciunt molestias ducimus sequi veniam quidem optio porro non? Non
-                sequi, deleniti sit nam debitis nulla ducimus in molestiae tempora.
-                Nihil molestiae dolores perferendis possimus consequatur. Dolor
-                obcaecati ipsum ipsa reprehenderit adipisci ut officia, quos maxime
-                eos voluptatibus pariatur magni fugit corporis architecto inventore
-                laborum rerum, necessitatibus, minima voluptatum.
-                </Typography>
-            </Sheet>
-        </>
-    );
+              Contact Us
+            </Typography>
+            <Typography level="body-lg" style={{ marginBottom: "1rem" }}>
+              Email: admin@rmutp.ac.th
+            </Typography>
+            <Typography level="body-lg" style={{ marginBottom: "1rem" }}>
+              Phone: +123 456 7890
+            </Typography>
+          </div>
+          <iframe
+            title="Google Map"
+            width="80%"
+            height="450"
+            loading="lazy"
+            allowFullScreen
+            style={{ marginTop: "100px", borderRadius: "20px", padding: 10 }}
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.602010843573!2d100.5120833!3d13.8182742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x73d2b2a69752fd89!2sFaculty%20of%20Science%20and%20Technology%2C%20Rajamangala%20University%20of%20Technology%20Phra%20Nakhon!5e0!3m2!1sen!2sus!4vYOUR_MAP_API_KEY"
+          ></iframe>
+        </section>
+      </Sheet>
+
+      <Sheet
+        sx={{
+          background: mode === "dark" ? "#080D1A" : "#080D1A",
+          padding: 5,
+          color: "white",
+        }}
+      >
+        <Grid
+          container
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          style={{ height: "100%" }}
+        >
+          <Typography level="body-lg" color="neutral">
+            © 2024 Room Reservation Rmutp. All rights reserved.
+          </Typography>
+          {/* <div>
+      <Typography level="body-lg" color="neutral">
+        Follow Us:
+      </Typography>
+      <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+        <img src="/images/facebook-icon.png" alt="Facebook" style={{ marginRight: '0.5rem' }} />
+      </a>
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+        <img src="/images/twitter-icon.png" alt="Twitter" style={{ marginRight: '0.5rem' }} />
+      </a>
+    </div> */}
+        </Grid>
+      </Sheet>
+    </div>
+  );
 };
 
 export default HomeUser;

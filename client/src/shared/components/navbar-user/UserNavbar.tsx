@@ -24,7 +24,6 @@ import CssBaseline from "@mui/joy/CssBaseline";
 import UserService from "../../../auth/service/UserService";
 import {
   Main,
-  MenuContainer,
   MenuItemContainer,
 } from "../navbar/NavbarStyled";
 import '../navbar/Hamburger.scss'
@@ -37,11 +36,13 @@ import {
   CardStyleUser,
   LayoutUser,
   LeftUser,
+  MenuContainer
 } from "./UserSidebarStyle";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Icon } from "@iconify/react";
+// import { Icon } from "@iconify/react";
 import { Link } from 'react-router-dom';
 import HomeUser from "../../../pages/user/index";
+import LogoRmutp from '../../../img/logo.png'
 
 interface LayoutState {
   leftOpen: boolean;
@@ -168,21 +169,17 @@ const UserProfileSidebar: React.FC = () => {
           zIndex: 2,
           boxShadow: "none",
           marginBottom: 2,
+          width:'30px',
+          "&:hover": {
+            transform: "scale(1.4)",
+          }
         }}
         
       >
         {mode === "light" ? (
-          <Icon
-            icon="line-md:sunny-filled-loop-to-moon-filled-loop-transition"
-            color="black"
-            fontSize={16}
-          />
+          <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Animals%20and%20Nature/Star.webp" alt="Star" width="25" height="25" />
         ) : (
-          <Icon
-            icon="line-md:moon-filled-alt-to-sunny-filled-loop-transition"
-            color="#fecf49"
-            fontSize={16}
-          />
+          <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Animals%20and%20Nature/Sun.webp" alt="Sun" width="25" height="25" />
         )}
       </IconButtonUser>
     );
@@ -199,28 +196,28 @@ const UserProfileSidebar: React.FC = () => {
         isShow: true,
         title: 'Reservation',
         path: 'room-user',
-        icon:''
+        icon:'<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Books.webp" alt="Books" width="25" height="25" />',
         // icon: <Icon icon="fluent-mdl2:reservation-orders" color="#235726" />
     },
     {
         isShow : localStorage.getItem('type') === 'teacher',
         title: 'Classroom',
         path: 'classroom-user',
-        icon:''
+        icon:'<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Books.webp" alt="Books" width="25" height="25" />',
         // icon: <Icon icon="ph:user-list-fill" color="#3F51B5"  />
     },
     {
         isShow: true,
         title: 'Reservation Status',
         path: 'status-user',
-        icon:''
+        icon:'<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Books.webp" alt="Books" width="25" height="25" />',
         // icon: <Icon icon="fluent-mdl2:sync-status-solid" color="#0077B2" />
     },
     {
         isShow: true,
         title: 'Reported Status',
         path: 'report-user',
-        icon:''
+        icon:'<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Books.webp" alt="Books" width="25" height="25" />',
         // icon: <Icon icon="fluent-mdl2:report-warning" color="red"  />
     }
 ]
@@ -245,19 +242,23 @@ const UserProfileSidebar: React.FC = () => {
                   </div>
               </div>
               <SidebarUser className={`sidebar ${leftOpen}`}>
-                <div className="header-left">
-                  <div className="logo-header">
-                    <Typography level="h2">LOGO</Typography>
+                <div style={{width:"100%"}}>
+                  <div className="logo-header d-flex justify-content-center ">
+                    <Link to="/user">
+                      <img src={LogoRmutp} alt=""  style={{width:"60px", height:"50px"}}/>
+                    </Link>
                   </div>
                 </div>
                 <Container className="content">
                 {UserSidebarData.map((item, index) => (
+                  <>
+                  {item.isShow && (
                   <MenuItems key={index}>
                     <MenuItemLinks
                       to={item.path}
                       onClick={() => handleTabChange(item.title)}
                     >
-                      <span className="size-icon">{item.icon}</span>
+                      <span className="icon-active" dangerouslySetInnerHTML={{__html: item.icon}}></span>
                       <Typography
                         noWrap
                         level="title-sm"
@@ -267,6 +268,8 @@ const UserProfileSidebar: React.FC = () => {
                       </Typography>
                     </MenuItemLinks>
                   </MenuItems>
+                  )} 
+                  </>
                 ))}
                 </Container>
               </SidebarUser>
@@ -274,25 +277,22 @@ const UserProfileSidebar: React.FC = () => {
           )}
           <Main id="main">
             <HeaderNav>
-              <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between gap-5 h-[--header-height]">
-                <Box sx={{ flexGrow: 0, marginBottom: 2 }}>
+              <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex items-center justify-between gap-5 h-[--header-height] pb-3">
+                <Box sx={{ flexGrow: 0,}}>
                   <span></span>
                 </Box>
                 {!isMobile && (
                   <>
-                    <Box sx={{ flexGrow: 0, marginBottom: 2 }}>
-                      <div className="lg:flex-1 flex items-center gap-1.5">
+                    <Box sx={{ flexGrow: 0,}}>
+                      <div className="lg:flex-1 flex items-center">
                           <Link to="/user">
-                            <Typography 
-                              level="h2" 
-                              >Rmutp
-                            </Typography>
+                          <img src={LogoRmutp} alt=""  style={{width:"60px", height:"50px"}}/>
                           </Link>
                       </div>
                     </Box>
                     <Box
                       component="nav"
-                      sx={{ flexGrow: 0, marginBottom: 2 }}
+                      sx={{ flexGrow: 0,}}
                     >
                       <List role="menubar" orientation="horizontal">
                         {UserSidebarData.map((item, index) => (
@@ -303,14 +303,14 @@ const UserProfileSidebar: React.FC = () => {
                               to={item.path}
                               onClick={() => handleTabChange(item.title)}
                             >
-                              <span className="size-icon">{item.icon}</span>
                               <Typography
                                 noWrap
                                 level="title-sm"
-                                style={{ marginLeft: "16px" }}
                               >
                                 {item.title}
                               </Typography>
+                              <span className="icon-active" dangerouslySetInnerHTML={{__html: item.icon}}></span>
+
                             </MenuItemLinksNav>
                           </MenuItemsNav>
                           )} 
@@ -320,18 +320,17 @@ const UserProfileSidebar: React.FC = () => {
                     </Box>
                   </>
                 )}
-                <div className="flex items-center justify-end gap-1.5">
-                  <Box sx={{width:"20px"}}>
+                
+                <div className="flex items-center justify-content-end gap-1.5">
+                  <Box sx={{width:"20px", marginTop:2}}>
                     <ColorSchemeToggle />
                   </Box>
                   <CardStyleUser onClick={handleMenuClick}>
                     <Box
                       sx={{
-                        p: 0.8,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        marginBottom: 2,
                       }}
                     >
                       <Avatar variant="solid" src={userProfile.user_img_path}>
@@ -352,7 +351,7 @@ const UserProfileSidebar: React.FC = () => {
                     id="profile-menu"
                     anchorEl={state.anchorEl}
                     open={Boolean(state.anchorEl)}
-                    sx={{ width: 120 }}
+                    sx={{ width: 130 }}
                     ref={menuRef}
                   >
                     <MenuItemContainer
@@ -374,7 +373,7 @@ const UserProfileSidebar: React.FC = () => {
                 </div>
               </div>
             </HeaderNav>
-            <div  style={{height:"100vh", overflowY:"auto"}}>
+            <div>
               <Outlet></Outlet>
               <Routes>
                 <Route path="/" element={<HomeUser />} />

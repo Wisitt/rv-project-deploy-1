@@ -7,6 +7,7 @@ import {
 import { Checkbox, Button, Sheet, Table, ModalDialog, Modal, Divider, FormControl, FormLabel, Stack, Input, Box, Select,Option,
   DialogTitle,
   Chip,
+  Tooltip
  } from '@mui/joy';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import {
@@ -126,16 +127,6 @@ const RoomList: React.FC = () => {
                         "--TableRow-hoverBackground": "rgba(0 0 0 / 0.08)",
                         height: 375,
                         overflow: "auto",
-                        background: (
-                        theme
-                        ) => `linear-gradient(${theme.vars.palette.background.surface} ,
-                                0 100%`,
-                        backgroundSize:
-                        "40px calc(100% - var(--TableCell-height)), 40px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height)), 14px calc(100% - var(--TableCell-height))",
-                        backgroundRepeat: "no-repeat",
-                        backgroundAttachment: "local, local, scroll, scroll",
-                        backgroundPosition:
-                        "var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height), var(--Table-firstColumnWidth) var(--TableCell-height), calc(100% - var(--Table-lastColumnWidth)) var(--TableCell-height)",
                         backgroundColor: "nav.bg",
                     }}
                     >
@@ -164,14 +155,14 @@ const RoomList: React.FC = () => {
                     >
                     <Theader >
                       <tr >
-                        <th style={{ width: 30 }}>No</th>
-                        <th style={{ width: 50 }}>Number</th>
+                        <th style={{ width: 50 }}>No</th>
+                        <th style={{ width: 150 }}>Number</th>
                         <th style={{ width: 100 }}>Type</th>
-                        <th style={{ width: 50 }}>Capacity</th>
-                        <th style={{ width: 100 }}>Facilities</th>
-                        <th style={{ width: 50 }}>Floor</th>
-                        <th style={{ width: 100 }}>Stauts</th>
-                        <th style={{ width: 40 }}>Actions</th>
+                        <th style={{ width: 100 }}>Capacity</th>
+                        <th style={{ width: 150 }}>Facilities</th>
+                        <th style={{ width: 100 }}>Floor</th>
+                        <th style={{ width: 150 }}>Status</th>
+                        <th style={{ width: 100 }}>Actions</th>
                         <th style={{ width: 180 }}>Active</th>
                       </tr>
                       <tr>
@@ -200,13 +191,35 @@ const RoomList: React.FC = () => {
                           <tr className="text-center" key={item.id || index}>
                             <th>{(page - 1) * rowsPerPage + index + 1}</th>
                             <th>
-                                {item.room_number}
+                            <Tooltip  title={item.room_number} arrow>
+                                <span>{item.room_number}</span>
+                            </Tooltip>  
                             </th>
-                            <th>{item.room_type}</th>
-                            <th>{item.room_capacity}</th>
-                            <th>{Array.isArray(item.room_facilities) ? item.room_facilities.join(", ") : item.room_facilities}</th>
-                            <th>{item.room_level}</th>
-                            <th>{parseInt(item.room_status, 10) === 1 ? "ห้องใช้งานได้" : "ห้องใช้งานไม่ได้"}</th>
+                            <th>
+                            <Tooltip  title={item.room_type} arrow>
+                                <span>{item.room_type}</span>
+                            </Tooltip> 
+                            </th>
+                            <th>
+                            <Tooltip  title={item.room_capacity} arrow>
+                                <span>{item.room_capacity}</span>
+                            </Tooltip> 
+                            </th>
+                            <th>
+                            <Tooltip  title={Array.isArray(item.room_facilities) ? item.room_facilities.join(", ") : item.room_facilities} arrow>
+                                <span>{Array.isArray(item.room_facilities) ? item.room_facilities.join(", ") : item.room_facilities}</span>
+                            </Tooltip> 
+                            </th>
+                            <th>
+                            <Tooltip  title={item.room_level} arrow>
+                                <span>{item.room_level}</span>
+                            </Tooltip> 
+                            </th>
+                            <th>
+                            <Tooltip  title={parseInt(item.room_status, 10) === 1 ? "ห้องใช้งานได้" : "ห้องใช้งานไม่ได้"} arrow>
+                                <span>{parseInt(item.room_status, 10) === 1 ? "ห้องใช้งานได้" : "ห้องใช้งานไม่ได้"}</span>
+                            </Tooltip> 
+                            </th>
                             <th>
                             <Checkbox
                               checked={selectedItems.includes(item.room_id)}
@@ -328,6 +341,8 @@ const RoomList: React.FC = () => {
                     <FormControl>
                         <FormLabel required>Floor</FormLabel>
                         <Select
+                            variant="solid"
+                            color="primary"
                             placeholder="เลือกชั้น"
                             onChange={(_, value) => setSelectedFloor(value as string | null)}
                         >
@@ -342,8 +357,8 @@ const RoomList: React.FC = () => {
                         <FormLabel required>Room</FormLabel>
                         <Select
                             required
-                            color="neutral"
-                            variant="soft"
+                            variant="solid"
+                            color="primary"
                             name="room_id"
                             value={editingRoom.room_id}
                             onChange={(_, value) =>
@@ -371,6 +386,8 @@ const RoomList: React.FC = () => {
                     <FormControl>
                       <FormLabel required>Type</FormLabel>
                       <Select
+                        variant="solid"
+                        color="primary"
                         required
                         name="room_type"
                         value={editingRoom.room_type}
@@ -394,11 +411,14 @@ const RoomList: React.FC = () => {
                         onChange={handleInputEditChange}
                         fullWidth
                         size="lg"
+                        color="primary"
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel required>Facilities</FormLabel>
                       <Select
+                      variant="solid"
+                      color="primary"
                         required
                         name="facilities_id"
                         value={editingRoom.facilities_id}
@@ -420,6 +440,8 @@ const RoomList: React.FC = () => {
                     <FormControl>
                       <FormLabel required>Status</FormLabel>
                       <Select
+                      variant="solid"
+                      color="primary"
                         defaultValue="select"
                         required
                         name="room_status"
@@ -477,6 +499,7 @@ const RoomList: React.FC = () => {
                         onChange={handleInputChange}
                         fullWidth
                         size="lg"
+                        color="primary"
                       />
                     </FormControl>
                     <FormControl>
@@ -487,11 +510,14 @@ const RoomList: React.FC = () => {
                         onChange={handleInputChange}
                         fullWidth
                         size="lg"
+                        color="primary"
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel required>Type</FormLabel>
                       <Select
+                        variant="solid"
+                        color="primary"
                         required
                         name="room_type"
                         value={AddRoom.room_type}
@@ -526,11 +552,14 @@ const RoomList: React.FC = () => {
                         onChange={handleInputChange}
                         fullWidth
                         size="lg"
+                        color="primary"
                       />
                     </FormControl>
                     <FormControl>
                       <FormLabel required>Facilities</FormLabel>
                       <Select
+                      variant="solid"
+                      color="primary"
                         required
                         name="facilities_id"
                         value={AddRoom.facilities_id.map(String)}
