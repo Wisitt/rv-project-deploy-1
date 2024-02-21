@@ -1,1 +1,0 @@
-import{b5 as r,au as d,g as s,b6 as u,b7 as o}from"./index-d3b06103.js";const h=r(),t=h;function n({props:e,name:a}){return d({props:e,name:a,defaultTheme:t,themeId:s})}const l=e=>o(e)&&e!=="classes",T=o,m=u({themeId:s,defaultTheme:t,rootShouldForwardProp:l}),f=m;export{T as a,t as d,l as r,f as s,n as u};
