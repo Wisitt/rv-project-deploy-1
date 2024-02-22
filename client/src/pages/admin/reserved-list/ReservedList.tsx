@@ -81,6 +81,7 @@ const ReservedList: React.FC = () => {
                             <DatePicker
                               className="datetime-picker"
                               format="DD MMMM YYYY"
+                              
                               value={reservationDate}
                               onChange={handleDateChange}
                             />

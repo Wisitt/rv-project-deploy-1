@@ -97,7 +97,6 @@ const useReservedList = () => {
     const handleDateChange = (value: dayjs.Dayjs | null) => {
       setSelectedDate(value);
     
-      // Clear reservation status when the date is cleared
       if (value === null) {
         setReservationStatus("");
       }
@@ -115,8 +114,10 @@ const useReservedList = () => {
         }
     
         if (reservationDate !== null) {
-          params.reservation_date = reservationDate.toISOString();
+          params.reservation_date = reservationDate.format();
         }
+        console.log(reservationDate);
+
     
         const response = await RoomService.getReservationList(params);
         console.log(response);
